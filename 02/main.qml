@@ -10,13 +10,30 @@ import QtQuick.Controls.Styles 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
+
+//
+import  QtQuick.Scene3D  2.0
+
+import  Qt3D.Core  2.0
+import  Qt3D.Render  2.0
+import  Qt3D.Input  2.0
+import  Qt3D.Extras  2.0
 ApplicationWindow {
     visible: true
     width: 1440
     height: 900
-    color: "white";
     title: "创新实践植物三维";
     id: root;
+
+    FileDialog
+    {
+        id: fileDialog
+        onAccepted:
+        {
+            mesh.source = fileDialog.fileUrl
+        }
+    }
+
     menuBar: MenuBar{
         id:menu
         Menu {
@@ -50,6 +67,7 @@ ApplicationWindow {
             MenuItem{
                 text: "3D状态";
 //                icon.source:"qrc:/icon/3D.png"
+                onTriggered: fileDialog.open()
             }
         }
     }
@@ -57,19 +75,73 @@ ApplicationWindow {
         id:area_3D
         width:parent.width/5*3
         height:parent.height
-//        gradient: Gradient{
-//            GradientStop{ position: 0.0; color: "lightsteelblue" }
-//            GradientStop{ position: 1.0; color: "slategray" }
-//        }
-//        Text{
-//            text:"3D显示区"
-//            anchors.centerIn: parent
-//        }
-        FirstModel{
-            id:firstmodel
-            visible:true
+        Scene3D
+        {
             anchors.fill: parent
+
+            aspects: [ "input" ,  "logic" ]
+            cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
+
+            Entity
+            {
+                id: sceneRoot
+
+                Camera
+                {
+                    id: camera
+                    projectionType: CameraLens.PerspectiveProjection
+                    fieldOfView:  30
+                    aspectRatio:  16 / 9
+                    nearPlane :  0.1
+                    farPlane :  1000.0
+                    position: Qt.vector3d(10.0,0.0,10.0)
+                    upVector: Qt.vector3d(0.0,1.0 ,0.0)
+                    viewCenter: Qt.vector3d(0.0,0.0,0.0)
+                }
+
+                OrbitCameraController
+                {
+                    camera: camera
+                }
+
+                components: [
+                    RenderSettings
+                    {
+                        activeFrameGraph: ForwardRenderer
+                        {
+                            clearColor: Qt.rgba(0,0.5,1,1)
+                            camera: camera
+                        }
+                    },
+                    InputSettings
+                    {
+                    }
+                ]
+
+                Mesh {
+                    id: mesh
+                }
+
+                PhongMaterial {
+                    id: phongmaterial
+                    ambient: Qt.rgba( 0.6, 0.2, 0.1, 1 )
+                    diffuse: Qt.rgba( 0.2, 0.6, 0.1, 1 )
+                    specular: Qt.rgba( 0.2, 0.9, 0.1, 1 )
+                    shininess: 1
+                }
+
+                Entity
+                {
+                    id: treeEntity
+
+                    components: [
+                        mesh,
+                        phongmaterial
+                    ]
+                }
+            }
         }
+
     }
     Rectangle{
         id:video
@@ -224,55 +296,55 @@ ApplicationWindow {
                     spacing: 10
                     Button{
                         width: 30
-                        height: 30
+                        height: 20
                         property int status: 1  //默认播放
-    //                    iconImage: "./Images/pause.png"
+                        iconSource: "qrc:/icon/play.png"
                         onClicked: {
-                            if(status===1)
+                            if(status==1)
                             {
                                 player.pause();
                                 tooltip="开始";
                                 console.log("start")
                                 status=0;
-                                iconImage="./Images/play.png"
+                                iconSource: "qrc:/icon/play.png"
                             }
                             else{
                                 player.play() ;
                                 tooltip="暂停";
                                 console.log("pause")
                                 status=1;
-                                iconImage="./Images/pause.png"
+                                iconSource: "qrc:/icon/pause.png"
                             }
                         }
                     }
                     Button{
                         width: 30
-                        height: 30
+                        height: 20
                         onClicked: player.stop()
                         tooltip: "停止"
-    //                    iconImage: "./Images/stop.png"
+                        iconSource: "qrc:/icon/stop.png"
                     }
                     //快进快退10s
                     Button{
                         width: 30
-                        height: 30
+                        height: 20
                         onClicked: player.seek(player.position+10000)
                         tooltip: "快退"
-    //                    iconImage: "./Images/back.png"
+                        iconSource: "qrc:/icon/back.png"
                     }
                     Button{
                         width: 30
-                        height: 30
+                        height: 20
                         onClicked: player.seek(player.position-10000)
                         tooltip: "快进"
-    //                    iconImage: "./Images/pass.png"
+                        iconSource: "qrc:/icon/pass.png"
                     }
                     Button{
                         width: 30
-                        height: 30
+                        height: 20
                         tooltip: "打开文件"
                         onClicked: fd.open()
-    //                    iconImage: "./Images/add.png"
+                        iconSource: "qrc:/icon/video.png"
                         FileDialog{
                             id:fd
                             nameFilters: ["Vedio Files(*.avi *.mp4 *rmvb *.rm)"]  //格式过滤
@@ -309,35 +381,6 @@ ApplicationWindow {
                 }
             }
         }
-//        MediaPlayer {
-//                id: player;
-////                source: "C:/Users/12974/Desktop";视频位置
-
-//                onError: {
-//                    console.log(errorString);
-//                }
-//            }
-
-//            VideoOutput {
-//                anchors.fill: parent;
-//                source: player;
-//            }
-
-//            MouseArea {
-//                anchors.fill: parent;
-//                onClicked: {
-//                    player.play();
-//                }
-//            }
-
-//        gradient: Gradient{
-//            GradientStop{ position: 0.0; color: "lightsteelblue" }
-//            GradientStop{ position: 1.0; color: "slategray" }
-//        }
-//        Text{
-//            text:"视频显示区"
-//            anchors.centerIn: parent
-//        }
     }
     Rectangle{
         id:picture
@@ -368,13 +411,5 @@ ApplicationWindow {
                     ]
             listview.model = images
         }
-//        gradient: Gradient{
-//            GradientStop{ position: 0.0; color: "lightsteelblue" }
-//            GradientStop{ position: 1.0; color: "slategray" }
-//        }
-//        Text{
-//            text:"照片显示区"
-//            anchors.centerIn: parent
-//        }
     }
 }
