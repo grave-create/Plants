@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icon/picture.png</file>
+        <file>icon/video.png</file>
+        <file>icon/3D.png</file>
+        <file>icon/camera.png</file>
+        <file>icon/back.png</file>
+        <file>icon/pass.png</file>
+        <file>icon/pause.png</file>
+        <file>icon/play.png</file>
+        <file>icon/stop.png</file>
+    </qresource>
+</RCC>
