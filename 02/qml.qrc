@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>FirstModel.qml</file>
+        <file>InputDialog.qml</file>
     </qresource>
 </RCC>

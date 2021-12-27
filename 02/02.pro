@@ -1,6 +1,10 @@
-QT += quick quick3d
+QT += quick quick3d\
+core gui\
+widgets \
+core gui multimedia multimediawidgets
+LIBS += D:\OpenCV-MinGW-Build-OpenCV-4.5.2-x64\x64\mingw\lib\libopencv_*.dll.a
+INCLUDEPATH += D:\OpenCV-MinGW-Build-OpenCV-4.5.2-x64\include\
 QT += multimedia
-
 CONFIG += c++11
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -8,6 +12,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        CameraCalibrator.cpp \
         main.cpp
 
 RESOURCES += qml.qrc \
@@ -23,3 +28,10 @@ QML_DESIGNER_IMPORT_PATH =
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    calibdata.txt \
+    calibdata_out.txt
+
+HEADERS += \
+    CameraCalibrator.h

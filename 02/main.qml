@@ -1,4 +1,4 @@
-import QtQuick 2.12
+﻿import QtQuick 2.12
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.3
 import QtQuick3D 1.15
@@ -10,10 +10,7 @@ import QtQuick.Controls.Styles 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
-
-//
 import  QtQuick.Scene3D  2.0
-
 import  Qt3D.Core  2.0
 import  Qt3D.Render  2.0
 import  Qt3D.Input  2.0
@@ -53,8 +50,14 @@ ApplicationWindow {
         }
         Menu {
             title: "处理";
+            InputDialog{id:input}
             MenuItem{
-                text: "相机处理";
+                objectName: "CameraCalibrate"
+                text: "相机标定";
+                onTriggered:{
+                    input.visible=true;
+
+                }
 //                icon.source:"qrc:/icon/camera.png"
             }
             MenuItem{

@@ -1,0 +1,10 @@
+../02/chessboard/chess1.bmp
+../02/chessboard/chess2.bmp
+../02/chessboard/chess3.bmp
+../02/chessboard/chess4.bmp
+../02/chessboard/chess5.bmp
+../02/chessboard/chess6.bmp
+../02/chessboard/chess7.bmp
+../02/chessboard/chess8.bmp
+../02/chessboard/chess9.bmp
+../02/chessboard/chess10.bmp
