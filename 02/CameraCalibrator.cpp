@@ -9,6 +9,7 @@
 #include  <iostream>
 #include <iomanip>
 #include <fstream>
+#include <qdir.h>
 using namespace std;
 using namespace cv;
 void CameraCalibrator::setBoardSize(QString bx,QString by,QString sx,QString sy){
@@ -22,23 +23,36 @@ vector<double> CameraCalibrator::getCameraMatrix(){
 vector<double> CameraCalibrator::getDistCoeffs(){
     return distCoeffs_vec;
 }
+
+QStringList CameraCalibrator::getFileNames(const QString &path)
+{
+    QDir dir(path);
+    QStringList nameFilters;
+    nameFilters << "*.jpg" << "*.png"<<"*.bmp";
+    QStringList files = dir.entryList(nameFilters, QDir::Files|QDir::Readable, QDir::Name);
+    return files;
+}
 void CameraCalibrator::CarmeraCalibrate()
     {
-        ifstream fin("../02/calibdata.txt"); /* 标定所用图像文件的路径 */
+        //ifstream fin("../02/calibdata.txt"); /* 标定所用图像文件的路径 */
         ofstream fout("../02/calibdata_out.txt");  /* 保存标定结果的文件 */
+        QString path="../02/chessboard";/* 标定所用图像文件的路径 */
+        QStringList chessimg_List=getFileNames(path);
         //读取每一幅图像，从中提取出角点，然后对角点进行亚像素精确化
-        cout<<"开始提取角点………………";
+        cout<<"开始提取角点………………"<<endl;
         int image_count=0;  /* 图像数量 */
         Size image_size;  /* 图像的尺寸 */
         vector<Point2f> image_points_buf;  /* 缓存每幅图像上检测到的角点 */
         vector<vector<Point2f>> image_points_seq; /* 保存检测到的所有角点 */
         string filename;
         int count= -1 ;//用于存储角点个数。
-        while (getline(fin,filename))
+        while (image_count<chessimg_List.size())
+        //while (getline(fin,filename))
         {
-            image_count++;
+            filename.append("../02/chessboard/");
+            filename.append(chessimg_List.at(image_count).toStdString());
             // 用于观察检验输出
-            cout<<"image_count = "<<image_count<<endl;
+            //cout<<"image_count = "<<image_count<<endl;
             /* 输出检验*/
             cout<<"-->count = "<<count<<endl;
             Mat imageInput=imread(filename);
@@ -49,15 +63,20 @@ void CameraCalibrator::CarmeraCalibrate()
                 cout<<"image_size.width = "<<image_size.width<<endl;
                 cout<<"image_size.height = "<<image_size.height<<endl;
             }
-
+            filename.clear();
             /* 提取角点 */
             if (0 == findChessboardCorners(imageInput,board_size,image_points_buf))
             {
                 cout<<"can not find chessboard corners!\n"; //找不到角点
-                exit(1);
+                chessimg_List.removeOne(chessimg_List.at(image_count));
+                continue;
+
             }
             else
             {
+                image_count++;
+                // 用于观察检验输出
+                cout<<"image_count = "<<image_count<<endl;
                 Mat view_gray;
                 cvtColor(imageInput,view_gray,COLOR_RGB2GRAY);
                 /* 亚像素精确化 */
@@ -212,20 +231,22 @@ void CameraCalibrator::CarmeraCalibrate()
         {
             std::cout<<"Frame #"<<i+1<<"..."<<endl;
             initUndistortRectifyMap(cameraMatrix,distCoeffs,R,cameraMatrix,image_size,CV_32FC1,mapx,mapy);
+            filename.append("../02/chessboard/");
+            filename.append(chessimg_List.at(i).toStdString());
             StrStm.clear();
             imageFileName.clear();
-            string filePath="../02/chessboard/chess";
+            //string filePath="../02/chessboard/Image_";
             StrStm<<i+1;
             StrStm>>imageFileName;
-            filePath+=imageFileName;
-            filePath+=".bmp";
-            Mat imageSource = imread(filePath);
+            //filePath+=imageFileName;
+            //filePath+=".jpg";
+            Mat imageSource = imread(filename);
             Mat newimage = imageSource.clone();
             //另一种不需要转换矩阵的方式
             //undistort(imageSource,newimage,cameraMatrix,distCoeffs);
             remap(imageSource,newimage,mapx, mapy, INTER_LINEAR);
             StrStm.clear();
-            filePath.clear();
+            filename.clear();
             StrStm<<i+1;
             StrStm>>imageFileName;
             imageFileName += "_d.jpg";

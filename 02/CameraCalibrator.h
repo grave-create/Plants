@@ -30,6 +30,7 @@ public slots:
     void CarmeraCalibrate();
     vector<double> getCameraMatrix();
     vector<double> getDistCoeffs();
+    QStringList getFileNames(const QString &path);
 
 };
 

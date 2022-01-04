@@ -3,5 +3,8 @@
         <file>main.qml</file>
         <file>FirstModel.qml</file>
         <file>InputDialog.qml</file>
+        <file>Counter.qml</file>
+        <file>ShowDelegate.qml</file>
+        <file>ShowModel.qml</file>
     </qresource>
 </RCC>

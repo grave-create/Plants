@@ -21,7 +21,12 @@ ApplicationWindow {
     height: 900
     title: "创新实践植物三维";
     id: root;
-
+    property string picturesLocation : "";
+    property var imageNameFilters : ["所有图片格式 (*.png; *.jpg; *.bmp; *.gif; *.jpeg)"];
+    property var pictureList : []
+    property var showmodel : ShowModel{}
+    property var filename : "D:/image/1.mp4"
+    property var pictureIndex : 0
     FileDialog
     {
         id: fileDialog
@@ -391,28 +396,128 @@ ApplicationWindow {
         y:video.height
         width:parent.width/5*2
         height:parent.height/2
-        ListView {
-            id: listview
-            height: 100
-            anchors{
-                left: parent.left
-                right: parent.right
-                top: parent.top
+        Row {
+            anchors.fill: parent
+            width:parent.width/5*3
+            height:parent.height/2
+            spacing: 10
+            Column{
+                 spacing: 10
+                 height: parent.height
+                 //预览图展示
+                 Rectangle {
+                        id:images
+                        //anchors.fill:        parent
+                        width:parent.width
+                        height: parent.height*4/5
+                        anchors.margins:     10
+                        border.color:        "black"
+
+                        GridView {
+                            id:              grid
+                            anchors.fill:    parent
+                            cellWidth:       (parent.width-40)/2
+                            cellHeight:      170
+                            anchors.margins: 20
+                            model:           showmodel
+                            delegate:        ShowDelegate{}
+                            clip:            true  // 超出边界的进行裁剪，即不显示，默认为false
+                            boundsBehavior:  Flickable.StopAtBounds  // 滑动不超出父框的大小
+                           }
+                      }
+                 //选取视频
+                 Row{
+                      spacing: 10
+                     Button{
+                               id:openBtn
+                               height: 25
+                               text:qsTr("选择分解的视频")
+                               anchors.leftMargin: 10
+                               onClicked: {
+                                   fileDialog1.open();
+                               }
+                           }
+                     Button{
+                               id:openBtn1
+                               height: 25
+                               text:qsTr("选择分解后图像保存路径")
+                               anchors.leftMargin: 10
+                               onClicked: {
+                                  fileDialog2.open()
+
+                               }
+                           }
+                     Button{
+                               id:deleteBtn
+                               height: 25
+                               text:qsTr("删除")
+                               anchors.leftMargin: 10
+                               onClicked: {
+                                   console.log(pictureIndex.toString())
+                                 temp.deleteImage(pictureIndex)
+
+                                   showmodel.clear()
+                                   //刷新
+                                   var list=temp.getFilename()
+                                   for(var i=0;i<list.length;i++)
+                                   {
+                                       var t = Object.create(null)
+                                       t["index"]=i;
+                                       t["picSrc"]="file:///"+list[i]
+                                       console.log(t["picSrc"])
+                                       showmodel.append(t)
+                                   }
+                                   mainImage.source=showmodel.get(pictureIndex).picSrc
+                               }
+                           }
+                      }
+                }
+            //大图显示
+            Rectangle {
+                     id:image
+                     //anchors.fill:        parent
+                     width:parent.width/2
+                     height: parent.height*4/5
+                     anchors.margins:     10
+                     border.color:        "black"
+                     Image{
+                         id:mainImage
+                         anchors.horizontalCenter:   parent.horizontalCenter
+                         anchors.verticalCenter:     parent.verticalCenter
+                         source:                     showmodel.get(pictureIndex).picSrc
+                         sourceSize.width:           parent.width * 0.90
+                         sourceSize.height:          parent.height * 0.90
+                     }
+                 }
             }
-            orientation: Qt.Horizontal
-            delegate:
-                Image {
-                source: modelData
-            }
+
+      }
+    FileDialog {
+        id: fileDialog1
+        title: "请选择输入视频"
+        nameFilters: ["(*.mp4 *.flv *.avi *.wmv *.mkv)"]
+        onAccepted: {
+              temp.photoCapture(fileDialog1.fileUrl.toString().substring(8,fileDialog1.fileUrl.length))
         }
-        Component.onCompleted: {
-            var images = [
-                        "http://doc.qt.io/qt-5/images/declarative-qtlogo.png",
-                        "http://doc.qt.io/qt-5/images/declarative-qtlogo.png",
-                        "http://doc.qt.io/qt-5/images/declarative-qtlogo.png",
-                        "http://doc.qt.io/qt-5/images/declarative-qtlogo.png"
-                    ]
-            listview.model = images
+       // onFolderChanged: picturesLocation = folder
+    }
+    FileDialog {
+        id: fileDialog2
+        title: "请选择保存路径"
+        selectFolder: true
+        folder: picturesLocation
+        nameFilters: imageNameFilters
+        onAccepted: {
+            temp.outImages(fileDialog2.fileUrl.toString().substring(8,fileDialog1.fileUrl.length))
+            var list=temp.getFilename()
+            for(var i=0;i<list.length;i++)
+            {
+                var t = Object.create(null)
+                t["index"]=i;
+                t["picSrc"]="file:///"+list[i]
+                showmodel.append(t)
+            }
+            mainImage.source=showmodel.get(pictureIndex).picSrc
         }
     }
 }

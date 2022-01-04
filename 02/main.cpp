@@ -13,7 +13,8 @@
 #include  <iostream>
 #include <iomanip>
 #include <fstream>
-#include"CameraCalibrator.h"
+#include "CameraCalibrator.h"
+#include "cameracalibration.h"
 using namespace std;
 using namespace cv;
 int main(int argc, char *argv[])
@@ -25,6 +26,8 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
+    Cameracalibration temp;
+    engine.rootContext()->setContextProperty("temp", &temp);
     //qmlRegisterType<CameraCalibrator>("Sources.CameraCalibrator", 1, 0, "CAMERA");
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     CameraCalibrator cameracalibrator;

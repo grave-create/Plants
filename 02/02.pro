@@ -13,6 +13,7 @@ CONFIG += c++11
 
 SOURCES += \
         CameraCalibrator.cpp \
+        cameracalibration.cpp \
         main.cpp
 
 RESOURCES += qml.qrc \
@@ -34,4 +35,5 @@ DISTFILES += \
     calibdata_out.txt
 
 HEADERS += \
-    CameraCalibrator.h
+    CameraCalibrator.h \
+    cameracalibration.h
